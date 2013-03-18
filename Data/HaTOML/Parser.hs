@@ -13,13 +13,13 @@ import           Data.HaTOML.Types
 toml :: Parser TOML
 toml = (TOML . M.fromList) <$> values
   where
-    values = skipSpace *> many keyvalue <* endOfInput
+    values = skip *> many keyvalue <* endOfInput
 
 keyvalue :: Parser (BS.ByteString, TValue)
 keyvalue = do
     k <- keyname
     v <- equal *> value
-    skipSpace
+    skip
     return (k, v)
 
 keyname :: Parser BS.ByteString
@@ -31,10 +31,8 @@ array :: Parser TValue
 array = TArray <$> arrayValues value
 
 arrayValues :: Parser TValue -> Parser [TValue]
-arrayValues val = do
-    skipSpace
-    values <- ((val <* skipSpace ) `sepBy` (char ',' *> skipSpace) <* char ']')
-    return values
+arrayValues val =
+    skipSpace *> ((val <* skipSpace ) `sepBy` (char ',' *> skipSpace) <* char ']')
 
 tstring :: Parser BS.ByteString
 tstring = takeWhile1 (/= '"') <* doubleQuote
@@ -58,6 +56,17 @@ num = do
       I n -> return $ TInteger n
       D n -> return $ TDouble n
 
-skipEmpty = takeWhile1 $ notInClass " \t\n"
+skip = do
+    _ <- scan False $ \s c ->
+        case (s, c) of
+          (True, '\r')  -> Just False
+          (True, '\n')  -> Just False
+          (True, _)     -> Just True
+          (_, '#')      -> Just True
+          _ | isSpace c -> Just s
+          otherwise     -> Nothing
+    return ()
+
+eol c = c == '\n' || c == '\r'
 equal = skipSpace *> char '=' <* skipSpace
 doubleQuote = char '"'
