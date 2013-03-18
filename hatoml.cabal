@@ -1,0 +1,20 @@
+name:           hatoml
+version:        0.1
+cabal-version:  >=1.2
+build-type:     Simple
+description:    TOML parser written in Haskell
+stability:      experimental
+author:         Gregor Uhlenheuer
+
+library
+    build-depends:
+        attoparsec >= 0.8.7,
+        base == 4.*,
+        bytestring,
+        containers,
+        time
+
+    exposed-modules:
+        Data.HaTOML
+        Data.HaTOML.Parser
+        Data.HaTOML.Types
