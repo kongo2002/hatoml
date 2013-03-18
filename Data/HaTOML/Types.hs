@@ -4,7 +4,9 @@ import qualified Data.ByteString.Char8 as BS
 import           Data.Map  ( Map )
 import           Data.Time ( UTCTime )
 
-type TOML = Map BS.ByteString TValue
+newtype TOML =
+    TOML (Map BS.ByteString TValue)
+    deriving ( Eq, Show, Ord )
 
 data TValue = TString !BS.ByteString
             | TInteger !Integer
@@ -12,4 +14,5 @@ data TValue = TString !BS.ByteString
             | TBool !Bool
             | TArray ![TValue]
             | TDate !UTCTime
+            | TGroup !TOML
               deriving ( Eq, Show, Ord )

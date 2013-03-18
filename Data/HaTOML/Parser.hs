@@ -3,14 +3,19 @@
 module Data.HaTOML.Parser where
 
 import           Control.Applicative
-import qualified Data.ByteString.Char8 as BS
+
+import qualified Data.Map as M
 import           Data.Attoparsec.ByteString.Char8
-import           Data.Attoparsec.Combinator
+import qualified Data.ByteString.Char8 as BS
 
 import           Data.HaTOML.Types
 
-toml = skipSpace *> many keyvalue <* endOfInput
+toml :: Parser TOML
+toml = (TOML . M.fromList) <$> values
+  where
+    values = skipSpace *> many keyvalue <* endOfInput
 
+keyvalue :: Parser (BS.ByteString, TValue)
 keyvalue = do
     k <- keyname
     v <- equal *> value
