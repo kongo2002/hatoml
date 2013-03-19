@@ -45,3 +45,7 @@ test-suite tests
         containers,
         old-locale,
         time
+
+source-repository head
+    type:       git
+    location:   git://github.com/kongo2002/hatoml.git
