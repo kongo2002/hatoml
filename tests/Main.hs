@@ -3,12 +3,12 @@
 module Main where
 
 import qualified Data.ByteString.Char8 as BS
-import qualified Data.Map as M
-import           Data.Maybe     ( fromJust )
+import qualified Data.Map              as M
+import           Data.Maybe                     ( fromJust )
 
-import           Test.HUnit     ( (@=?) )
-import           Test.Framework ( defaultMain, testGroup, Test )
-import           Test.Framework.Providers.HUnit
+import           Test.HUnit                     ( (@=?) )
+import           Test.Framework                 ( defaultMain, testGroup, Test )
+import           Test.Framework.Providers.HUnit ( testCase )
 
 import           Data.HaTOML
 import           Data.HaTOML.Types
