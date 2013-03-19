@@ -5,6 +5,7 @@ module Main where
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.Map              as M
 import           Data.Maybe                     ( fromJust )
+import           Data.Time                      ( fromGregorian, UTCTime(..) )
 
 import           Test.HUnit                     ( (@=?) )
 import           Test.Framework                 ( defaultMain, testGroup, Test )
@@ -27,6 +28,14 @@ p :: BS.ByteString -> TOML
 p = fromJust . parse
 
 
+testDate :: UTCTime
+testDate =
+    UTCTime day time
+  where
+    day  = fromGregorian 1990 9 20
+    time = 60 * 60 * 14
+
+
 tests :: [Test]
 tests = [
     testGroup "Parsing of basic data types" [
@@ -36,7 +45,8 @@ tests = [
         testCase "negative double"  (toplevel (TDouble (-0.01)) @=? p "test = -0.01"),
         testCase "boolean true"     (toplevel (TBool True) @=? p "test = true"),
         testCase "boolean false"    (toplevel (TBool False) @=? p "test = false"),
-        testCase "strings"          (toplevel (TString "foobar") @=? p "test = \"foobar\"")
+        testCase "string"           (toplevel (TString "foobar") @=? p "test = \"foobar\""),
+        testCase "datetime"         (toplevel (TDate testDate) @=? p "test = 1990-09-20T14:00:00Z")
         ],
     testGroup "Parsing of arrays" [
         testCase "integer arrays"   (toplevel (TArray [TInteger 1, TInteger 2]) @=? p "test = [1,2]"),

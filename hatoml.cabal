@@ -12,6 +12,7 @@ library
         base == 4.*,
         bytestring,
         containers,
+        old-locale,
         time
 
     exposed-modules:
@@ -36,4 +37,5 @@ test-suite tests
         base,
         bytestring,
         containers,
+        old-locale,
         time
