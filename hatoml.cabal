@@ -1,10 +1,16 @@
 name:           hatoml
 version:        0.1
 cabal-version:  >=1.8
-build-type:     Simple
-description:    TOML parser written in Haskell
+category:       Text
 stability:      experimental
-author:         Gregor Uhlenheuer
+copyright:      (c) 2013 Gregor Uhlenheuer
+author:         Gregor Uhlenheuer <kongo2002@googlemail.com>
+maintainer:     Gregor Uhlenheuer <kongo2002@googlemail.com>
+homepage:       https://github.com/kongo2002/hatoml
+bug-reports:    https://github.com/kongo2002/hatoml/issues
+build-type:     Simple
+synopsis:       TOML parsing library
+description:    TOML parsing library
 
 library
     build-depends:
