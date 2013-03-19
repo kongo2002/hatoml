@@ -7,6 +7,8 @@ import           Control.Applicative
 import qualified Data.Map as M
 import           Data.Attoparsec.ByteString.Char8
 import qualified Data.ByteString.Char8 as BS
+import           Data.Time.Format ( parseTime )
+import           System.Locale    ( defaultTimeLocale, iso8601DateFormat )
 
 import           Data.HaTOML.Types
 
@@ -38,7 +40,10 @@ tstring :: Parser BS.ByteString
 tstring = takeWhile1 (/= '"') <* doubleQuote
 
 value :: Parser TValue
-value = others <|> num
+value =
+    others <|>
+    date <|>
+    num
   where
     others = do
       c <- satisfy (`BS.elem` "[\"tf")
@@ -56,6 +61,7 @@ num = do
       I n -> return $ TInteger n
       D n -> return $ TDouble n
 
+skip :: Parser ()
 skip = do
     _ <- scan False $ \s c ->
         case (s, c) of
@@ -66,6 +72,17 @@ skip = do
           _ | isSpace c -> Just s
           otherwise     -> Nothing
     return ()
+
+date :: Parser TValue
+date = do
+    d <- takeTill (== 'Z') <* char 'Z'
+    parseDate (BS.unpack d)
+  where
+    iso8601      = iso8601DateFormat $ Just "%X"
+    parseDate bs =
+      case parseTime defaultTimeLocale iso8601 bs of
+        Just t  -> return $ TDate t
+        Nothing -> fail "failed to parse date"
 
 eol c = c == '\n' || c == '\r'
 equal = skipSpace *> char '=' <* skipSpace
