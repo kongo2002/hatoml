@@ -1,6 +1,6 @@
 name:           hatoml
 version:        0.1
-cabal-version:  >=1.2
+cabal-version:  >=1.8
 build-type:     Simple
 description:    TOML parser written in Haskell
 stability:      experimental
@@ -18,3 +18,22 @@ library
         Data.HaTOML
         Data.HaTOML.Parser
         Data.HaTOML.Types
+
+test-suite tests
+    type:           exitcode-stdio-1.0
+    hs-source-dirs: tests
+    main-is:        Main.hs
+
+    ghc-options:
+        -Wall -threaded
+
+    build-depends:
+        HUnit,
+        test-framework,
+        test-framework-hunit,
+        hatoml,
+        attoparsec,
+        base,
+        bytestring,
+        containers,
+        time
