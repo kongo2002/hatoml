@@ -23,6 +23,7 @@ library
 
     exposed-modules:
         Data.HaTOML
+        Data.HaTOML.Encode
         Data.HaTOML.Parser
         Data.HaTOML.Types
 
