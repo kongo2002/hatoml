@@ -47,7 +47,14 @@ fromValue (TGroup (TOML m)) =
     M.foldrWithKey' proc (charUtf8 '\n') m
   where
     proc k v a = charUtf8 '\n' <> val k v <> a
-    val k v = byteString k <> charUtf8 '=' <> fromValue v
+    val k v = byteString k <> stringUtf8 " = " <> fromValue v
+fromValue (TArray []) = stringUtf8 "[]"
+fromValue (TArray a) =
+    charUtf8 '[' <>
+    fromValue (head a) <>
+    foldr proc (charUtf8 ']') (tail a)
+  where
+    proc x a = stringUtf8 ", " <> fromValue x <> a
 
 
 infixr 4 <>
