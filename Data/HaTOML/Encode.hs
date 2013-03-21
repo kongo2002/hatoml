@@ -7,7 +7,9 @@ import           Data.ByteString.Lazy.Builder
 import           Data.ByteString.Lazy.Builder.ASCII ( integerDec, doubleDec )
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.Map as M
+import           Data.Time.Format                   ( formatTime )
 import           Numeric                            ( showHex )
+import           System.Locale                      ( defaultTimeLocale, iso8601DateFormat )
 
 import Data.HaTOML.Types
 
@@ -43,6 +45,11 @@ fromValue (TString s) =
         | c < '\x20' = "\\u" ++ replicate (4 - length hex) '0' ++ hex
         | otherwise  = [c]
         where hex = showHex (fromEnum c) ""
+fromValue (TDate d) =
+    stringUtf8 date <> charUtf8 'Z'
+  where
+    format = iso8601DateFormat $ Just "%X"
+    date   = formatTime defaultTimeLocale format d
 fromValue (TGroup (TOML m)) =
     M.foldrWithKey' proc (charUtf8 '\n') m
   where
