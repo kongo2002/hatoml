@@ -53,5 +53,11 @@ tests = [
         testCase "double arrays"    (toplevel (TArray [TDouble 1.0, TDouble 2.1]) @=? p "test = [1.0,2.1]"),
         testCase "boolean arrays"   (toplevel (TArray [TBool False, TBool True]) @=? p "test = [false,true]"),
         testCase "string arrays"    (toplevel (TArray [TString "a", TString "b"]) @=? p "test = [\"a\",\"b\"]")
+        ],
+    testGroup "Parsing of strings" [
+        testCase "empty string"     (toplevel (TString "") @=? p "test = \"\""),
+        testCase "special chars #1" (toplevel (TString "] ") @=? p "test = \"] \""),
+        testCase "special chars #2" (toplevel (TString " # ") @=? p "test = \" # \""),
+        testCase "special chars #3" (toplevel (TString " \n \t ") @=? p "test = \" \\n \\t \"")
         ]
     ]

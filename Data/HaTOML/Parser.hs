@@ -2,6 +2,7 @@
 
 module Data.HaTOML.Parser where
 
+import           Prelude hiding   ( takeWhile )
 import           Control.Applicative
 
 import qualified Data.Map as M
@@ -37,7 +38,7 @@ arrayValues val =
     skipSpace *> ((val <* skipSpace ) `sepBy` (char ',' *> skipSpace) <* char ']')
 
 tstring :: Parser BS.ByteString
-tstring = takeWhile1 (/= '"') <* doubleQuote
+tstring = takeWhile (/= '"') <* doubleQuote
 
 value :: Parser TValue
 value =
