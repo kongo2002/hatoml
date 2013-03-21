@@ -53,3 +53,4 @@ fromValue (TGroup (TOML m)) =
 infixr 4 <>
 (<>) :: Monoid m => m -> m -> m
 (<>) = mappend
+{-# INLINE (<>) #-}
