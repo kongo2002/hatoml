@@ -49,16 +49,19 @@ tests = [
         testCase "datetime"         (toplevel (TDate testDate) @=? p "test = 1990-09-20T14:00:00Z")
         ],
     testGroup "Parsing of arrays" [
-        testCase "integer arrays"   (toplevel (TArray [TInteger 1, TInteger 2]) @=? p "test = [1,2]"),
-        testCase "double arrays"    (toplevel (TArray [TDouble 1.0, TDouble 2.1]) @=? p "test = [1.0,2.1]"),
-        testCase "boolean arrays"   (toplevel (TArray [TBool False, TBool True]) @=? p "test = [false,true]"),
-        testCase "string arrays"    (toplevel (TArray [TString "a", TString "b"]) @=? p "test = [\"a\",\"b\"]")
+        testCase "integer arrays" (toplevel (TArray [TInteger 1, TInteger 2]) @=? p "test = [1,2]"),
+        testCase "double arrays"  (toplevel (TArray [TDouble 1.0, TDouble 2.1]) @=? p "test = [1.0,2.1]"),
+        testCase "boolean arrays" (toplevel (TArray [TBool False, TBool True]) @=? p "test = [false,true]"),
+        testCase "string arrays"  (toplevel (TArray [TString "a", TString "b"]) @=? p "test = [\"a\",\"b\"]")
         ],
     testGroup "Parsing of strings" [
-        testCase "empty string"     (toplevel (TString "") @=? p "test = \"\""),
-        testCase "special chars #1" (toplevel (TString "] ") @=? p "test = \"] \""),
-        testCase "special chars #2" (toplevel (TString " # ") @=? p "test = \" # \""),
-        testCase "special chars #3" (toplevel (TString " \n \t ") @=? p "test = \" \\n \\t \""),
-        testCase "unicode chars"    (toplevel (TString " é ") @=? p "test = \" \\u00E9 \"")
+        testCase "empty string"         (toplevel (TString "") @=? p "test = \"\""),
+        testCase "special chars #1"     (toplevel (TString "] ") @=? p "test = \"] \""),
+        testCase "special chars #2"     (toplevel (TString " # ") @=? p "test = \" # \""),
+        testCase "special chars #3"     (toplevel (TString "#") @=? p "test = \"#\""),
+        testCase "special chars #4"     (toplevel (TString " \n \t ") @=? p "test = \" \\n \\t \""),
+        testCase "unicode chars"        (toplevel (TString " é ") @=? p "test = \" \\u00E9 \""),
+        testCase "escaped double quote" (toplevel (TString " \"'s '\"") @=? p "test = \" \\\"'s '\\\"\""),
+        testCase "escaped characters"   (toplevel (TString "\"\n\t\b") @=? p "test = \"\\\"\\n\\t\\b\"")
         ]
     ]
