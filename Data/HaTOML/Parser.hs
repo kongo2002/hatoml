@@ -37,8 +37,12 @@ arrayValues :: Parser TValue -> Parser [TValue]
 arrayValues val =
     skipSpace *> ((val <* skipSpace ) `sepBy` (char ',' *> skipSpace) <* char ']')
 
-tstring :: Parser BS.ByteString
-tstring = takeWhile (/= '"') <* doubleQuote
+tstring = many' tchar <* doubleQuote
+
+tchar = char '\\' *> (tescape {- <|> TODO: unicode -}) <|> satisfy (`BS.notElem` "\"\\")
+
+tescape = choice (zipWith decode "bnfrt\\\"/" "\b\n\f\r\t\\\"/")
+    where decode c r = r <$ char c
 
 value :: Parser TValue
 value =
@@ -50,7 +54,7 @@ value =
       c <- satisfy (`BS.elem` "[\"tf")
       case c of
         '[' -> array
-        '"' -> TString <$> tstring
+        '"' -> (TString . BS.pack) <$> tstring
         't' -> string "rue" *> pure (TBool True)
         'f' -> string "alse" *> pure (TBool False)
         _   -> error "captain! we've been hit!"
@@ -84,6 +88,7 @@ date = do
       case parseTime defaultTimeLocale iso8601 bs of
         Just t  -> return $ TDate t
         Nothing -> fail "failed to parse date"
+
 
 eol c = c == '\n' || c == '\r'
 equal = skipSpace *> char '=' <* skipSpace
