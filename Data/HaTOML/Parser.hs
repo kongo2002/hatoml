@@ -5,10 +5,11 @@ module Data.HaTOML.Parser where
 import           Prelude hiding   ( takeWhile )
 import           Control.Applicative
 
-import qualified Data.Map as M
 import           Data.Attoparsec.ByteString.Char8
 import qualified Data.ByteString.Char8 as BS
+import qualified Data.Map as M
 import           Data.Time.Format ( parseTime )
+import           Numeric          ( readHex )
 import           System.Locale    ( defaultTimeLocale, iso8601DateFormat )
 
 import           Data.HaTOML.Types
@@ -39,10 +40,19 @@ arrayValues val =
 
 tstring = many' tchar <* doubleQuote
 
-tchar = char '\\' *> (tescape {- <|> TODO: unicode -}) <|> satisfy (`BS.notElem` "\"\\")
+tchar = char '\\' *> (tescape <|> tunicode) <|> satisfy (`BS.notElem` "\"\\")
 
 tescape = choice (zipWith decode "bnfrt\\\"/" "\b\n\f\r\t\\\"/")
     where decode c r = r <$ char c
+
+tunicode = char 'u' *> (decode <$> count 4 hexDigit)
+    where
+        isHexDigit c = isDigit c ||
+                       (c >= 'a' && c <= 'f') ||
+                       (c >= 'A' && c <= 'F')
+        hexDigit = satisfy isHexDigit
+        decode x = toEnum code
+            where ((code,_):_) = readHex x
 
 value :: Parser TValue
 value =

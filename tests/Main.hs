@@ -58,6 +58,7 @@ tests = [
         testCase "empty string"     (toplevel (TString "") @=? p "test = \"\""),
         testCase "special chars #1" (toplevel (TString "] ") @=? p "test = \"] \""),
         testCase "special chars #2" (toplevel (TString " # ") @=? p "test = \" # \""),
-        testCase "special chars #3" (toplevel (TString " \n \t ") @=? p "test = \" \\n \\t \"")
+        testCase "special chars #3" (toplevel (TString " \n \t ") @=? p "test = \" \\n \\t \""),
+        testCase "unicode chars"    (toplevel (TString " é ") @=? p "test = \" \\u00E9 \"")
         ]
     ]
