@@ -1,4 +1,7 @@
-module Data.HaTOML where
+module Data.HaTOML
+    ( parse
+    , encode
+    ) where
 
 import qualified Data.Attoparsec.ByteString.Char8 as AB
 import qualified Data.ByteString.Char8 as BS

@@ -1,6 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Data.HaTOML.Parser where
+module Data.HaTOML.Parser
+    ( toml
+    ) where
 
 import           Prelude hiding   ( takeWhile )
 import           Control.Applicative
@@ -9,15 +11,19 @@ import           Data.Attoparsec.ByteString.Char8
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.Map as M
 import           Data.Time.Format ( parseTime )
+
 import           Numeric          ( readHex )
+
 import           System.Locale    ( defaultTimeLocale, iso8601DateFormat )
 
 import           Data.HaTOML.Types
+
 
 toml :: Parser TOML
 toml = (TOML . M.fromList) <$> values
   where
     values = skip *> many keyvalue <* endOfInput
+
 
 keyvalue :: Parser (BS.ByteString, TValue)
 keyvalue = do
@@ -26,24 +32,31 @@ keyvalue = do
     skip
     return (k, v)
 
+
 keyname :: Parser BS.ByteString
 keyname = do
     skipSpace
     takeWhile1 $ notInClass " \t\n="
 
+
 array :: Parser TValue
 array = TArray <$> arrayValues value
+
 
 arrayValues :: Parser TValue -> Parser [TValue]
 arrayValues val =
     skipSpace *> ((val <* skipSpace ) `sepBy` (char ',' *> skipSpace) <* char ']')
 
+
 tstring = many' tchar <* doubleQuote
+
 
 tchar = char '\\' *> (tescape <|> tunicode) <|> satisfy (`BS.notElem` "\"\\")
 
+
 tescape = choice (zipWith decode "bnfrt\\\"/" "\b\n\f\r\t\\\"/")
     where decode c r = r <$ char c
+
 
 tunicode = char 'u' *> (decode <$> count 4 hexDigit)
     where
@@ -53,6 +66,7 @@ tunicode = char 'u' *> (decode <$> count 4 hexDigit)
         hexDigit = satisfy isHexDigit
         decode x = toEnum code
             where ((code,_):_) = readHex x
+
 
 value :: Parser TValue
 value =
@@ -69,12 +83,14 @@ value =
         'f' -> string "alse" *> pure (TBool False)
         _   -> error "captain! we've been hit!"
 
+
 num :: Parser TValue
 num = do
     n <- number
     case n of
       I n -> return $ TInteger n
       D n -> return $ TDouble n
+
 
 skip :: Parser ()
 skip = do
@@ -87,6 +103,7 @@ skip = do
           _ | isSpace c -> Just s
           otherwise     -> Nothing
     return ()
+
 
 date :: Parser TValue
 date = do

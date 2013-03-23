@@ -1,6 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Data.HaTOML.Encode where
+module Data.HaTOML.Encode
+    ( fromToml
+    , fromValue
+    ) where
 
 import           Data.Monoid                        ( mappend, Monoid )
 import           Data.ByteString.Lazy.Builder
@@ -8,7 +11,9 @@ import           Data.ByteString.Lazy.Builder.ASCII ( integerDec, doubleDec )
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.Map as M
 import           Data.Time.Format                   ( formatTime )
+
 import           Numeric                            ( showHex )
+
 import           System.Locale                      ( defaultTimeLocale, iso8601DateFormat )
 
 import Data.HaTOML.Types

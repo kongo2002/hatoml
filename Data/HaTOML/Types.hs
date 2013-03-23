@@ -1,4 +1,7 @@
-module Data.HaTOML.Types where
+module Data.HaTOML.Types
+    ( TOML(..)
+    , TValue(..)
+    ) where
 
 import qualified Data.ByteString.Char8 as BS
 import           Data.Map  ( Map )
@@ -7,6 +10,7 @@ import           Data.Time ( UTCTime )
 newtype TOML =
     TOML (Map BS.ByteString TValue)
     deriving ( Eq, Show, Ord )
+
 
 data TValue = TString !BS.ByteString
             | TInteger !Integer
