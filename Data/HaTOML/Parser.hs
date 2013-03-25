@@ -2,6 +2,7 @@
 
 module Data.HaTOML.Parser
     ( toml
+    , tomlGroups
     ) where
 
 import           Prelude hiding   ( takeWhile )
@@ -23,6 +24,23 @@ toml :: Parser TOML
 toml = (TOML . M.fromList) <$> values
   where
     values = skip *> many keyvalue <* endOfInput
+
+
+tomlGroups :: Parser [Either [BS.ByteString] (BS.ByteString, TValue)]
+tomlGroups = skip *> many element <* endOfInput
+
+
+element :: Parser (Either [BS.ByteString] (BS.ByteString, TValue))
+element = eitherP group keyvalue
+
+
+group :: Parser [BS.ByteString]
+group = do
+    skipSpace
+    char '['
+    (part `sepBy1` char '.') <* char ']'
+  where
+    part = takeWhile1 $ notInClass "]."
 
 
 keyvalue :: Parser (BS.ByteString, TValue)

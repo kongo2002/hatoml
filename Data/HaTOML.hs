@@ -1,5 +1,6 @@
 module Data.HaTOML
     ( parse
+    , parseGroups
     , encode
     ) where
 
@@ -12,11 +13,20 @@ import Data.HaTOML.Encode
 import Data.HaTOML.Parser
 import Data.HaTOML.Types
 
+
 parse :: BS.ByteString -> Maybe TOML
 parse bs =
     case AB.parseOnly toml bs of
       Left _  -> Nothing
       Right r -> Just r
+
+
+parseGroups :: BS.ByteString -> Maybe [Either [BS.ByteString] (BS.ByteString, TValue)]
+parseGroups bs =
+    case AB.parseOnly tomlGroups bs of
+      Left _  -> Nothing
+      Right r -> Just r
+
 
 encode :: TOML -> LBS.ByteString
 encode = toLazyByteString . fromToml
