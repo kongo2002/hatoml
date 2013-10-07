@@ -16,6 +16,8 @@ import Data.HaTOML.Parser
 import Data.HaTOML.Types
 
 
+-- | Try to parse the given bytestring into the matching
+-- TOML representation.
 parse :: BS.ByteString -> Either String TOML
 parse bs = AB.parseOnly toml bs >>= parse'
 
@@ -28,6 +30,8 @@ parse' ts =
     func (l, t) (Right (k, v)) = (l, insertValue (l++[k]) v t)
 
 
+-- | Try to parse the given bytestring into a list of
+-- matching TOML tokens.
 parseTokens :: BS.ByteString -> Either String [TOMLToken]
 parseTokens = AB.parseOnly toml
 
@@ -55,5 +59,7 @@ groupChain []     = TGroup tempty
 groupChain (k:ks) = TGroup $ TOML $ M.singleton k (groupChain ks)
 
 
+-- | Encode the specified TOML data structure into
+-- a lazy bytestring representation.
 encode :: TOML -> LBS.ByteString
 encode = toLazyByteString . fromToml
