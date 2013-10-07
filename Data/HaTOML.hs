@@ -1,11 +1,14 @@
 module Data.HaTOML
-    ( encode
+    ( parse
+    , parseTokens
+    , encode
     ) where
 
 import qualified Data.Attoparsec.ByteString.Char8 as AB
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.ByteString.Lazy.Char8 as LBS
 import           Data.ByteString.Lazy.Builder
+import           Data.List ( foldl' )
 import qualified Data.Map as M
 
 import Data.HaTOML.Encode
@@ -13,30 +16,20 @@ import Data.HaTOML.Parser
 import Data.HaTOML.Types
 
 
-{- parse :: BS.ByteString -> Either String TOML -}
-{- parse = AB.parseOnly toml -}
+parse :: BS.ByteString -> Either String TOML
+parse bs = AB.parseOnly toml bs >>= parse'
 
 
-{- parseMaybe :: BS.ByteString -> Maybe TOML -}
-{- parseMaybe bs = -}
-    {- case AB.parseOnly toml bs of -}
-      {- Left _  -> Nothing -}
-      {- Right r -> Just r -}
+parse' :: [TOMLToken] -> Either String TOML
+parse' ts =
+    return $ snd $ foldl' func ([], tempty) ts
+  where
+    func (_, t) (Left ks)      = (ks, insertGroup ks t)
+    func (l, t) (Right (k, v)) = (l, insertValue (l++[k]) v t)
 
 
 parseTokens :: BS.ByteString -> Either String [TOMLToken]
 parseTokens = AB.parseOnly toml
-
-
-parseTokensMaybe :: BS.ByteString -> Maybe [TOMLToken]
-parseTokensMaybe bs =
-    case AB.parseOnly toml bs of
-      Left _  -> Nothing
-      Right r -> Just r
-
-
-encode :: TOML -> LBS.ByteString
-encode = toLazyByteString . fromToml
 
 
 insertValue :: [BS.ByteString] -> TValue -> TOML -> TOML
@@ -62,3 +55,5 @@ groupChain []     = TGroup tempty
 groupChain (k:ks) = TGroup $ TOML $ M.singleton k (groupChain ks)
 
 
+encode :: TOML -> LBS.ByteString
+encode = toLazyByteString . fromToml
