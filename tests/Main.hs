@@ -4,7 +4,6 @@ module Main where
 
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.Map              as M
-import           Data.Maybe                     ( fromJust )
 import           Data.Time                      ( fromGregorian, UTCTime(..) )
 
 import           Test.HUnit                     ( (@=?) )
@@ -25,7 +24,8 @@ toplevel val =
 
 
 p :: BS.ByteString -> TOML
-p = fromJust . parse
+p bs = let (Right toml) = parse bs
+       in toml
 
 
 testDate :: UTCTime
