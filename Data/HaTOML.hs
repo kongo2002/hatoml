@@ -42,6 +42,8 @@ insertValue (k:ks) v m =
     tinsertWith func k v m
   where
     func _   (TGroup o) = TGroup $ insertValue ks v o
+    -- TODO: according to the TOML spec this should
+    -- throw an error
     func new _          = new
 
 
@@ -51,6 +53,8 @@ insertGroup (k:ks) m =
     tinsertWith func k (groupChain ks) m
   where
     func _ (TGroup o) = TGroup $ insertGroup ks o
+    -- TODO: according to the TOML spec this should
+    -- throw an error
     func _ v          = v
 
 
