@@ -2,8 +2,9 @@
 
 module Data.HaTOML.Parser
     ( toml
-    , tomlGroups
+    , TOMLToken
     ) where
+
 
 import           Prelude hiding   ( takeWhile )
 import           Control.Applicative
@@ -20,17 +21,14 @@ import           System.Locale    ( defaultTimeLocale, iso8601DateFormat )
 import           Data.HaTOML.Types
 
 
-toml :: Parser TOML
-toml = (TOML . M.fromList) <$> values
-  where
-    values = skip *> many keyvalue <* endOfInput
+type TOMLToken = Either [BS.ByteString] (BS.ByteString, TValue)
 
 
-tomlGroups :: Parser [Either [BS.ByteString] (BS.ByteString, TValue)]
-tomlGroups = skip *> many element <* endOfInput
+toml :: Parser [TOMLToken]
+toml = skip *> many element <* endOfInput
 
 
-element :: Parser (Either [BS.ByteString] (BS.ByteString, TValue))
+element :: Parser TOMLToken
 element = eitherP group keyvalue
 
 
