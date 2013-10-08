@@ -60,7 +60,7 @@ array = TArray <$> arrayValues value
 
 arrayValues :: Parser TValue -> Parser [TValue]
 arrayValues val =
-    skipSpace *> ((val <* skipSpace ) `sepBy` (char ',' *> skipSpace) <* arrayEnd)
+    skip *> ((val <* skip) `sepBy` (char ',' *> skip) <* arrayEnd)
 
 
 arrayEnd = do

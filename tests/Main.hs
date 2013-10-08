@@ -69,6 +69,15 @@ tests = [
     testCase "escaped double quote" (toplevel (TString " \"'s '\"") @=? p "test = \" \\\"'s '\\\"\""),
     testCase "escaped characters"   (toplevel (TString "\"\n\t\b") @=? p "test = \"\\\"\\n\\t\\b\"")
     ],
+  testGroup "Parsing of comments" [
+    testCase "comment at start" (toplevel (TInteger 3) @=? p "# comment\n test = 3\n"),
+    testCase "comment after"    (toplevel (TInteger 4) @=? p "test = 4 # comment"),
+    testCase "comment at end"   (toplevel (TInteger 5) @=? p "test = 5\n# comment"),
+    testCase "comment in array #1" (toplevel (TArray [TInteger 5, TInteger 28]) @=? p "test = [5,28\n# comment\n]"),
+    testCase "comment in array #2" (toplevel (TArray [TInteger 5, TInteger 28]) @=? p "test = [5,28# comment\n]"),
+    testCase "comment in array #3" (toplevel (TArray [TInteger 5, TInteger 28]) @=? p "test = [5 # comment\n,28,\n# comment\n]"),
+    testCase "comment in array #4" (toplevel (TArray [TInteger 5, TInteger 28]) @=? p "test = [\n# comment\n5,28# comment\n]")
+    ],
   testGroup "Various tests" [
     testCase "empty result"    ((TOML $ M.empty) @=? p ""),
     testCase "whitespace only" ((TOML $ M.empty) @=? p "    \n   \t  ")
