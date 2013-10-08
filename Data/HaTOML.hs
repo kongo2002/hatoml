@@ -26,8 +26,9 @@ parse' :: [TOMLToken] -> Either String TOML
 parse' ts =
     return $ snd $ foldl' func ([], tempty) ts
   where
-    func (_, t) (Left ks)      = (ks, insertGroup ks t)
-    func (l, t) (Right (k, v)) = (l, insertValue (l++[k]) v t)
+    func (_, t) (TKeyGroup ks)     = (ks, insertGroup ks t)
+    func (l, t) (TKeyValue (k, v)) = (l, insertValue (l++[k]) v t)
+    func _      _                  = error "tables are not implemented yet"
 
 
 -- | Try to parse the given bytestring into a list of

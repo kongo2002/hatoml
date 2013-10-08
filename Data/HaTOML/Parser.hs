@@ -2,7 +2,7 @@
 
 module Data.HaTOML.Parser
     ( toml
-    , TOMLToken
+    , TOMLToken(..)
     ) where
 
 
@@ -20,7 +20,11 @@ import           System.Locale    ( defaultTimeLocale, iso8601DateFormat )
 import           Data.HaTOML.Types
 
 
-type TOMLToken = Either [BS.ByteString] (BS.ByteString, TValue)
+data TOMLToken =
+      TKeyGroup [BS.ByteString]
+    | TTable [BS.ByteString]
+    | TKeyValue (BS.ByteString, TValue)
+    deriving (Show, Eq)
 
 
 toml :: Parser [TOMLToken]
@@ -28,24 +32,33 @@ toml = skip *> many element <* endOfInput
 
 
 element :: Parser TOMLToken
-element = eitherP group keyvalue
+element =
+    skip *> (table <|> group <|> keyvalue)
 
 
-group :: Parser [BS.ByteString]
-group = do
-    skip
-    char '['
-    (part `sepBy1` char '.') <* char ']'
+table :: Parser TOMLToken
+table = do
+    _ <- char '['
+    _ <- char '['
+    TTable <$> (part `sepBy1` char '.') <* char ']' <* char ']'
   where
     part = takeWhile1 $ notInClass "]."
 
 
-keyvalue :: Parser (BS.ByteString, TValue)
+group :: Parser TOMLToken
+group = do
+    _ <- char '['
+    TKeyGroup <$> (part `sepBy1` char '.') <* char ']'
+  where
+    part = takeWhile1 $ notInClass "]."
+
+
+keyvalue :: Parser TOMLToken
 keyvalue = do
     k <- keyname
     v <- equal *> value
     skip
-    return (k, v)
+    return $ TKeyValue (k, v)
 
 
 keyname :: Parser BS.ByteString
@@ -123,7 +136,7 @@ skip = do
           (True, _)     -> Just True
           (_, '#')      -> Just True
           _ | isSpace c -> Just s
-          otherwise     -> Nothing
+          _     -> Nothing
     return ()
 
 
