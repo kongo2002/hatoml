@@ -20,11 +20,10 @@ import           System.Locale    ( defaultTimeLocale, iso8601DateFormat )
 import           Data.HaTOML.Types
 
 
-data TOMLToken =
-      TKeyGroup [BS.ByteString]
-    | TTable [BS.ByteString]
-    | TKeyValue (BS.ByteString, TValue)
-    deriving (Show, Eq)
+data TOMLToken = TKeyGroup [BS.ByteString]
+               | TTableArray [BS.ByteString]
+               | TKeyValue (BS.ByteString, TValue)
+                 deriving ( Eq, Show, Ord )
 
 
 toml :: Parser [TOMLToken]
@@ -40,7 +39,7 @@ table :: Parser TOMLToken
 table = do
     _ <- char '['
     _ <- char '['
-    TTable <$> (part `sepBy1` char '.') <* char ']' <* char ']'
+    TTableArray <$> (part `sepBy1` char '.') <* char ']' <* char ']'
   where
     part = takeWhile1 $ notInClass "]."
 
@@ -63,7 +62,6 @@ keyvalue = do
 
 keyname :: Parser BS.ByteString
 keyname = do
-    skipSpace
     takeWhile1 $ notInClass " \t\n="
 
 

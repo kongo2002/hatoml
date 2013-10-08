@@ -23,6 +23,7 @@ data TValue = TString !BS.ByteString
             | TArray ![TValue]
             | TDate !UTCTime
             | TGroup !TOML
+            | TTable ![TOML]
               deriving ( Eq, Show, Ord )
 
 

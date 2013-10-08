@@ -28,7 +28,7 @@ parse' ts =
   where
     func (_, t) (TKeyGroup ks)     = (ks, insertGroup ks t)
     func (l, t) (TKeyValue (k, v)) = (l, insertValue (l++[k]) v t)
-    func _      _                  = error "tables are not implemented yet"
+    func (_, t) (TTableArray ks)   = (ks, insertTable ks t)
 
 
 -- | Try to parse the given bytestring into a list of
@@ -42,10 +42,10 @@ insertValue [k] v m    = tinsert k v m
 insertValue (k:ks) v m =
     tinsertWith func k v m
   where
-    func _   (TGroup o) = TGroup $ insertValue ks v o
-    -- TODO: according to the TOML spec this should
-    -- throw an error
-    func new _          = new
+    func _ (TGroup o)      = TGroup $ insertValue ks v o
+    func _ (TTable [])     = TTable [insertValue ks v tempty]
+    func _ (TTable (o:os)) = TTable $ (insertValue ks v o) : os
+    func _ _               = error "captain! we've been hit!"
 
 
 insertGroup :: [BS.ByteString] -> TOML -> TOML
@@ -54,9 +54,19 @@ insertGroup (k:ks) m =
     tinsertWith func k (groupChain ks) m
   where
     func _ (TGroup o) = TGroup $ insertGroup ks o
-    -- TODO: according to the TOML spec this should
-    -- throw an error
-    func _ v          = v
+    func _ _          = error "captain! we've been hit!"
+
+
+insertTable :: [BS.ByteString] -> TOML -> TOML
+insertTable [k] m    = tinsert k (TTable []) m
+insertTable (k:ks) m =
+    tinsertWith func k (tableChain ks) m
+  where
+    func _ (TGroup o) = TGroup $ insertTable ks o
+    func _ _          = error "captain! we've been hit!"
+
+    tableChain []     = TTable []
+    tableChain (x:xs) = TGroup $ TOML $ M.singleton x (tableChain xs)
 
 
 groupChain :: [BS.ByteString] -> TValue
