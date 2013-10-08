@@ -1,4 +1,4 @@
-# HaTOML - TOML parser/encoder written in haskell
+# hatoml - TOML parser/encoder written in haskell
 
 [TOML][toml] (Tom's Obvious Minimal Language) by *Tom Preston-Werner* is a
 simple configuration file format inspired by JSON and YAML.
@@ -6,7 +6,7 @@ simple configuration file format inspired by JSON and YAML.
 
 ## Usage
 
-You can build HaTOML using *cabal*:
+You can build **hatoml** using *cabal*:
 
     $ cabal configure
     $ cabal build
@@ -26,7 +26,7 @@ parseFile f = parse `fmap` BS.readFile f
 
 ## Compatibility
 
-As of now **HaTOML** is compatible with TOML [v0.2][latest]
+As of now **hatoml** is compatible with TOML [v0.2][latest]
 `4f23be43e42775493f142e7dd025b6227e037dd9` except from *arrays of tables* (which
 I hope to implement real soon).
 
@@ -73,7 +73,7 @@ hosts = [
 ]
 ~~~
 
-HaTOML parses the above TOML file into the following data structure:
+**hatoml** parses the above TOML file into the following data structure:
 
 ~~~ {.haskell}
 Right
