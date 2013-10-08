@@ -70,7 +70,7 @@ tests = [
     testCase "escaped characters"   (toplevel (TString "\"\n\t\b") @=? p "test = \"\\\"\\n\\t\\b\"")
     ],
   testGroup "Various tests" [
-    testCase "empty result"    ((TOML $ M.fromList []) @=? p ""),
-    testCase "whitespace only" ((TOML $ M.fromList []) @=? p "    \n   \t  ")
+    testCase "empty result"    ((TOML $ M.empty) @=? p ""),
+    testCase "whitespace only" ((TOML $ M.empty) @=? p "    \n   \t  ")
     ]
   ]
