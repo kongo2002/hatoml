@@ -68,5 +68,9 @@ tests = [
     testCase "unicode chars"        (toplevel (TString " é ") @=? p "test = \" \\u00E9 \""),
     testCase "escaped double quote" (toplevel (TString " \"'s '\"") @=? p "test = \" \\\"'s '\\\"\""),
     testCase "escaped characters"   (toplevel (TString "\"\n\t\b") @=? p "test = \"\\\"\\n\\t\\b\"")
+    ],
+  testGroup "Various tests" [
+    testCase "empty result"    ((TOML $ M.fromList []) @=? p ""),
+    testCase "whitespace only" ((TOML $ M.fromList []) @=? p "    \n   \t  ")
     ]
   ]
