@@ -11,7 +11,6 @@ import           Control.Applicative
 
 import           Data.Attoparsec.ByteString.Char8
 import qualified Data.ByteString.Char8 as BS
-import qualified Data.Map as M
 import           Data.Time.Format ( parseTime )
 
 import           Numeric          ( readHex )
@@ -61,7 +60,14 @@ array = TArray <$> arrayValues value
 
 arrayValues :: Parser TValue -> Parser [TValue]
 arrayValues val =
-    skipSpace *> ((val <* skipSpace ) `sepBy` (char ',' *> skipSpace) <* char ']')
+    skipSpace *> ((val <* skipSpace ) `sepBy` (char ',' *> skipSpace) <* arrayEnd)
+
+
+arrayEnd = do
+    skip
+    optional $ char ','
+    skip
+    char ']'
 
 
 tstring = many' tchar <* doubleQuote
