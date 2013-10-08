@@ -33,7 +33,7 @@ element = eitherP group keyvalue
 
 group :: Parser [BS.ByteString]
 group = do
-    skipSpace
+    skip
     char '['
     (part `sepBy1` char '.') <* char ']'
   where
