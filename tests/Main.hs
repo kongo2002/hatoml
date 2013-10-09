@@ -94,6 +94,10 @@ tests = [
     testCase "key names #1" (kv "test?" (TInteger 5) @=? p "test? = 5"),
     testCase "key names #2" (kv "test_1" (TInteger 9) @=? p "test_1=9")
     ],
+  testGroup "Parsing of arrays of tables" [
+    testCase "array of tables #1" (val (TTable []) @=? p "[[test]]"),
+    testCase "array of tables #2" (val (TTable [TOML $ M.singleton "foo" (TInteger 1)]) @=? p "[[test]]\nfoo = 1")
+    ],
   testGroup "Various tests" [
     testCase "empty result"    ((TOML $ M.empty) @=? p ""),
     testCase "whitespace only" ((TOML $ M.empty) @=? p "    \n   \t  ")
