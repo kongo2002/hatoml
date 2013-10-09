@@ -58,7 +58,12 @@ insertGroup (k:ks) m =
 
 
 insertTable :: [BS.ByteString] -> TOML -> TOML
-insertTable [k] m    = tinsert k (TTable []) m
+insertTable [k] m    =
+    tinsertWith func k (TTable []) m
+  where
+    func _ (TTable t) = TTable $ tempty : t
+    func _ _          = TTable []
+
 insertTable (k:ks) m =
     tinsertWith func k (tableChain ks) m
   where
