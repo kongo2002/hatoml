@@ -1,5 +1,7 @@
 # hatoml - TOML parser/encoder written in haskell
 
+[![build](https://api.travis-ci.org/kongo2002/hatoml.png)][travis]
+
 [TOML][toml] (Tom's Obvious Minimal Language) by *Tom Preston-Werner* is a
 simple configuration file format inspired by JSON and YAML.
 
@@ -123,3 +125,4 @@ Right
 
 [toml]: https://github.com/mojombo/toml
 [latest]: https://github.com/mojombo/toml/commit/4f23be43e42775493f142e7dd025b6227e037dd9
+[travis]: https://travis-ci.org/kongo2002/hatoml/
