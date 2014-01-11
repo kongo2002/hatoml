@@ -38,6 +38,11 @@ p bs = let (Right toml) = parse bs
        in toml
 
 
+toms :: BS.ByteString -> TValue -> TOML
+toms k v =
+    TOML $ M.singleton k v
+
+
 testDate :: UTCTime
 testDate =
     UTCTime day time
@@ -96,10 +101,11 @@ tests = [
     ],
   testGroup "Parsing of arrays of tables" [
     testCase "array of tables #1" (val (TTable []) @=? p "[[test]]"),
-    testCase "array of tables #2" (val (TTable [TOML $ M.singleton "foo" (TInteger 1)]) @=? p "[[test]]\nfoo = 1")
+    testCase "array of tables #2" (val (TTable [toms "foo" (TInteger 1)]) @=? p "[[test]]\nfoo = 1"),
+    testCase "array of tables #3" (val (TTable [toms "foo" (TInteger 2), TOML M.empty, toms "foo" (TInteger 1)]) @=? p "[[test]]\nfoo = 1\n[[test]]\n[[test]]\nfoo = 2")
     ],
   testGroup "Various tests" [
-    testCase "empty result"    ((TOML $ M.empty) @=? p ""),
-    testCase "whitespace only" ((TOML $ M.empty) @=? p "    \n   \t  ")
+    testCase "empty result"    (TOML M.empty @=? p ""),
+    testCase "whitespace only" (TOML M.empty @=? p "    \n   \t  ")
     ]
   ]
