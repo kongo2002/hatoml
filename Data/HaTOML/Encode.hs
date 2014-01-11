@@ -5,10 +5,11 @@ module Data.HaTOML.Encode
     , fromValue
     ) where
 
-import           Data.Monoid                        ( mappend, Monoid )
+import           Data.Monoid                        ( mappend, mconcat, Monoid )
 import           Data.ByteString.Lazy.Builder
 import           Data.ByteString.Lazy.Builder.ASCII ( integerDec, doubleDec )
 import qualified Data.ByteString.Char8 as BS
+import           Data.List                          ( intersperse )
 import qualified Data.Map as M
 import           Data.Time.Format                   ( formatTime )
 
@@ -20,16 +21,18 @@ import Data.HaTOML.Types
 
 
 fromToml :: TOML -> Builder
-fromToml = fromValue . TGroup
+fromToml = fromValue [] . TGroup
 
 
-fromValue :: TValue -> Builder
-fromValue (TBool b) =
-    stringUtf8 enc
+fromValue :: [BS.ByteString] -> TValue -> Builder
+fromValue _ (TBool b) = stringUtf8 enc
   where enc = if b then "true" else "false"
-fromValue (TInteger i) = integerDec i
-fromValue (TDouble d) = doubleDec d
-fromValue (TString s) =
+
+fromValue _ (TInteger i) = integerDec i
+
+fromValue _ (TDouble d) = doubleDec d
+
+fromValue _ (TString s) =
     charUtf8 '"' <> quote s <> charUtf8 '"'
   where
     quote str =
@@ -50,23 +53,36 @@ fromValue (TString s) =
         | c < '\x20' = "\\u" ++ replicate (4 - length hex) '0' ++ hex
         | otherwise  = [c]
         where hex = showHex (fromEnum c) ""
-fromValue (TDate d) =
+
+fromValue _ (TDate d) =
     stringUtf8 date <> charUtf8 'Z'
   where
     format = iso8601DateFormat $ Just "%X"
     date   = formatTime defaultTimeLocale format d
-fromValue (TGroup (TOML m)) =
-    M.foldrWithKey' proc (charUtf8 '\n') m
+
+fromValue sec (TGroup (TOML m)) =
+    M.foldrWithKey' proc empty m
   where
-    proc k v a = charUtf8 '\n' <> val k v <> a
-    val k v = byteString k <> stringUtf8 " = " <> fromValue v
-fromValue (TArray []) = stringUtf8 "[]"
-fromValue (TArray a) =
+    empty = byteString BS.empty
+    nl = charUtf8 '\n'
+    proc k v a = nl <> value k v <> a
+
+    value k v =
+        case v of
+          g@(TGroup _) -> group <> fromValue sec' g
+          _            -> byteString k <> stringUtf8 " = " <> fromValue sec' v
+      where
+        sec'    = sec ++ [k]
+        group   = charUtf8 '[' <> section sec' <> charUtf8 ']'
+        section = mconcat . intersperse (charUtf8 '.') . map byteString
+
+fromValue _ (TArray []) = stringUtf8 "[]"
+fromValue s (TArray a) =
     charUtf8 '[' <>
-    fromValue (head a) <>
+    fromValue s (head a) <>
     foldr proc (charUtf8 ']') (tail a)
   where
-    proc x a = stringUtf8 ", " <> fromValue x <> a
+    proc x a = stringUtf8 ", " <> fromValue s x <> a
 
 
 infixr 4 <>
