@@ -67,8 +67,9 @@ insertTable [k] m    =
 insertTable (k:ks) m =
     tinsertWith func k (tableChain ks) m
   where
-    func _ (TGroup o) = TGroup $ insertTable ks o
     func _ _          = error "captain! we've been hit!"
+    func _ (TGroup o)      = TGroup $ insertTable ks o
+    func _ (TTable (o:os)) = TTable $ insertTable ks o : os
 
     tableChain []     = TTable []
     tableChain (x:xs) = TGroup $ TOML $ M.singleton x (tableChain xs)
