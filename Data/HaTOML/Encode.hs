@@ -5,6 +5,7 @@ module Data.HaTOML.Encode
     , fromValue
     ) where
 
+import           Prelude hiding                     ( unlines )
 import           Data.Monoid                        ( mappend, mconcat, Monoid )
 import           Data.ByteString.Lazy.Builder
 import           Data.ByteString.Lazy.Builder.ASCII ( integerDec, doubleDec )
@@ -15,7 +16,8 @@ import           Data.Time.Format                   ( formatTime )
 
 import           Numeric                            ( showHex )
 
-import           System.Locale                      ( defaultTimeLocale, iso8601DateFormat )
+import           System.Locale                      ( defaultTimeLocale
+                                                    , iso8601DateFormat )
 
 import Data.HaTOML.Types
 
@@ -70,19 +72,32 @@ fromValue sec (TGroup (TOML m)) =
     value k v =
         case v of
           g@(TGroup _) -> group <> fromValue sec' g
+          t@(TTable _) -> fromValue sec' t
           _            -> byteString k <> stringUtf8 " = " <> fromValue sec' v
       where
         sec'    = sec ++ [k]
         group   = charUtf8 '[' <> section sec' <> charUtf8 ']'
-        section = mconcat . intersperse (charUtf8 '.') . map byteString
 
 fromValue _ (TArray []) = stringUtf8 "[]"
-fromValue s (TArray a) =
+fromValue s (TArray as) =
     charUtf8 '[' <>
-    fromValue s (head a) <>
-    foldr proc (charUtf8 ']') (tail a)
+    fromValue s (head as) <>
+    foldr proc (charUtf8 ']') (tail as)
   where
     proc x a = stringUtf8 ", " <> fromValue s x <> a
+
+fromValue sec (TTable ts) =
+    unlines $ map proc ts
+  where
+    nl = charUtf8 '\n'
+    section' = stringUtf8 "[[" <> section sec <> stringUtf8 "]]" <> nl
+    unlines = mconcat . intersperse nl
+
+    proc t = section' <> fromToml t
+
+
+section :: [BS.ByteString] -> Builder
+section = mconcat . intersperse (charUtf8 '.') . map byteString
 
 
 infixr 4 <>
