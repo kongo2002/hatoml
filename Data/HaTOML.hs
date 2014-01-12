@@ -44,7 +44,7 @@ insertValue (k:ks) v m =
   where
     func _ (TGroup o)      = TGroup $ insertValue ks v o
     func _ (TTable [])     = TTable [insertValue ks v tempty]
-    func _ (TTable (o:os)) = TTable $ (insertValue ks v o) : os
+    func _ (TTable (o:os)) = TTable $ insertValue ks v o : os
     func _ _               = error "captain! we've been hit!"
 
 
@@ -67,9 +67,9 @@ insertTable [k] m    =
 insertTable (k:ks) m =
     tinsertWith func k (tableChain ks) m
   where
-    func _ _          = error "captain! we've been hit!"
     func _ (TGroup o)      = TGroup $ insertTable ks o
     func _ (TTable (o:os)) = TTable $ insertTable ks o : os
+    func _ _               = error "captain! we've been hit!"
 
     tableChain []     = TTable []
     tableChain (x:xs) = TGroup $ TOML $ M.singleton x (tableChain xs)
