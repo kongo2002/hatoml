@@ -18,8 +18,8 @@ library
         base == 4.*,
         bytestring,
         containers,
-        old-locale,
-        time
+        scientific,
+        time >= 1.5
 
     exposed-modules:
         Data.HaTOML
@@ -44,8 +44,7 @@ test-suite tests
         base,
         bytestring,
         containers,
-        old-locale,
-        time
+        time >= 1.5
 
 source-repository head
     type:       git

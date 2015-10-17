@@ -11,11 +11,11 @@ import           Control.Applicative
 
 import           Data.Attoparsec.ByteString.Char8
 import qualified Data.ByteString.Char8 as BS
-import           Data.Time.Format ( parseTime )
+import           Data.Time.Format ( parseTimeM, defaultTimeLocale
+                                  , iso8601DateFormat )
+import           Data.Scientific  ( floatingOrInteger )
 
 import           Numeric          ( readHex )
-
-import           System.Locale    ( defaultTimeLocale, iso8601DateFormat )
 
 import           Data.HaTOML.Types
 
@@ -61,8 +61,7 @@ keyvalue = do
 
 
 keyname :: Parser BS.ByteString
-keyname = do
-    takeWhile1 $ notInClass " \t\n="
+keyname = takeWhile1 $ notInClass " \t\n="
 
 
 array :: Parser TValue
@@ -119,10 +118,10 @@ value =
 
 num :: Parser TValue
 num = do
-    n <- number
+    n <- floatingOrInteger <$> scientific
     case n of
-      I n -> return $ TInteger n
-      D n -> return $ TDouble n
+      (Left f)  -> return $ TDouble f
+      (Right i) -> return $ TInteger i
 
 
 skip :: Parser ()
@@ -145,7 +144,7 @@ date = do
   where
     iso8601      = iso8601DateFormat $ Just "%X"
     parseDate bs =
-      case parseTime defaultTimeLocale iso8601 bs of
+      case parseTimeM True defaultTimeLocale iso8601 bs of
         Just t  -> return $ TDate t
         Nothing -> fail "failed to parse date"
 

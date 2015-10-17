@@ -65,7 +65,7 @@ tests = [
     ],
   testGroup "Parsing of arrays" [
     testCase "integer arrays"         (val (TArray [TInteger 1, TInteger 2]) @=? p "test = [1,2]"),
-    testCase "double arrays"          (val (TArray [TDouble 1.0, TDouble 2.1]) @=? p "test = [1.0,2.1]"),
+    testCase "double arrays"          (val (TArray [TDouble 1.85, TDouble 2.1]) @=? p "test = [1.85,2.1]"),
     testCase "boolean arrays"         (val (TArray [TBool False, TBool True]) @=? p "test = [false,true]"),
     testCase "string arrays"          (val (TArray [TString "a", TString "b"]) @=? p "test = [\"a\",\"b\"]"),
     testCase "array of array"         (val (TArray [TArray [TInteger 1]]) @=? p "test = [[1]]"),

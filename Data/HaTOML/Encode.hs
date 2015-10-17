@@ -10,16 +10,15 @@ import           Data.Monoid                        ( mappend, mconcat, Monoid )
 import           Data.ByteString.Lazy.Builder
 import           Data.ByteString.Lazy.Builder.ASCII ( integerDec, doubleDec )
 import qualified Data.ByteString.Char8 as BS
+import           Data.Time.Format                   ( defaultTimeLocale
+                                                    , iso8601DateFormat
+                                                    , formatTime )
 import           Data.List                          ( intersperse )
 import qualified Data.Map as M
-import           Data.Time.Format                   ( formatTime )
 
 import           Numeric                            ( showHex )
 
-import           System.Locale                      ( defaultTimeLocale
-                                                    , iso8601DateFormat )
-
-import Data.HaTOML.Types
+import           Data.HaTOML.Types
 
 
 fromToml :: TOML -> Builder
